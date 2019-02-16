@@ -1,7 +1,7 @@
 --- a/bin/CrashPlanEngine.orig
 +++ b/bin/CrashPlanEngine
 @@ -128,7 +128,7 @@
- case $1 in
+ case $OPERATION in
  	start)
  	
 -		FULL_CP="$TARGETDIR/lib/com.backup42.desktop.jar:$TARGETDIR/lang"
