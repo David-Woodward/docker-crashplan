@@ -23,12 +23,14 @@ expect "does not exist.  Create"
 send "y\r"
 
 expect "What directory contains your SYSV init scripts?"
-send "/etc/init.d\r"
+#send "/etc/init.d\r"
+send "\r"
 
 expect "What directory contains your runlevel init links?"
-send "/etc/rc2.d\r"
+#send "/etc/rc2.d\r"
+send "\r"
 
-expect "Create /etc/rc2.d?"
+expect "does not exist.  Create"
 send "y\r"
 
 expect "Is this correct?"

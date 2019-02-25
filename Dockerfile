@@ -1,3 +1,8 @@
+# FROM ubuntu:latest
+# RUN apt-get update && \
+#     apt-get install -y wget ca-certificates socat gawk openssl cpio net-tools netcat inotify-tools patch && \
+#     rm -rf /var/lib/apt/lists/*
+
 FROM alpine:3.9
 
 # Here we install GNU libc (aka glibc) and set en_US.UTF-8 locale as default.
@@ -6,7 +11,8 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    apk add --no-cache wget ca-certificates socat && \
+    apk add --no-cache wget ca-certificates socat gawk bash openssl findutils coreutils procps libstdc++ && \
+    apk add --no-cache cpio --repository http://dl-3.alpinelinux.org/alpine/edge/community/ && \
     wget --progress=bar:force \
         "https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub" \
          -O "/etc/apk/keys/sgerrand.rsa.pub" && \
@@ -21,6 +27,7 @@ RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases
     /usr/glibc-compat/bin/localedef --force --inputfile en_US --charmap UTF-8 en_US.UTF-8 && \
     echo "export LANG=en_US.UTF-8" > /etc/profile.d/locale.sh && \
     rm "/root/.wget-hsts" && \
+    rm -rf /var/cache/apk/* && \
     rm \
        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \

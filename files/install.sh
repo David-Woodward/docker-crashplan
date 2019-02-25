@@ -6,8 +6,8 @@ CRASHPLAN_URL=$1
 SOURCEDIR=/usr/local/crashplan
 
 install_deps='expect'
-apk add --update bash openssl findutils coreutils procps libstdc++ rsync $install_deps
-apk add cpio --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/
+apk add ${install_deps}
+#apt-get install -y patch
 
 mkdir /tmp/crashplan
 
@@ -47,7 +47,8 @@ SOURCEDIR=/usr/local/crashplan
 mv /tmp/installation/entrypoint.sh /tmp/installation/crashplan.sh /tmp/installation/headless-init.sh /
 
 # Remove unneccessary package
-apk del $install_deps
+apk del ${install_deps}
+#apt-get purge ${install_deps} && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Remove unneccessary files and directories
 rm -rf ${SOURCEDIR}/*.pid \
