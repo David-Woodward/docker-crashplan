@@ -19,49 +19,54 @@ ENV LC_ALL=en_US.UTF-8      \
 #########################################
 ##   BASE IMAGE SETUP AND CP INSTALL   ##
 #########################################
-ADD /files/crashplan.exp /files/trim_install.sh /files/move_config.sh /tmp/installation/
 
 # Here we install GNU libc (aka glibc) and set en_US.UTF-8 locale as default.
-RUN CRASHPLAN_VERSION=6.9.2 && \
-    CRASHPLAN_TIMESTAMP=1525200006692 && \
-    CRASHPLAN_BUILD=759 && \
-    CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
-    ALPINE_GLIBC_BASE_URL='https://github.com/sgerrand/alpine-pkg-glibc/releases/download' && \
+RUN ALPINE_GLIBC_BASE_URL='https://github.com/sgerrand/alpine-pkg-glibc/releases/download' && \
     ALPINE_GLIBC_PACKAGE_VERSION='2.29-r0' && \
     ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
-    CRASHPLAN_PATH=/usr/local/crashplan && \
-    CRASHPLAN_INSTALLER_DEPENDENCIES=expect && \
     apk add --no-cache wget ca-certificates socat gawk bash openssl findutils coreutils procps libstdc++ && \
     apk add --no-cache cpio --repository http://dl-3.alpinelinux.org/alpine/edge/community/ && \
-    apk add --no-cache ${CRASHPLAN_INSTALLER_DEPENDENCIES} && \
 
     # Installing and configuring glibc for alpine
     wget --progress=bar:force \
         'https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub' \
          -O '/etc/apk/keys/sgerrand.rsa.pub' && \
-    wget --progress=bar:force \
-         "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" \
-         "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" \
-         "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" && \
-    apk add --no-cache \
-         "${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" \
-         "${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" \
-         "${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" && \
+
+    wget --progress=bar:force "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" && \
+    apk add --no-cache "${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" && \
+    rm -f "${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" && \
+
+    wget --progress=bar:force "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" && \
+    apk add --no-cache "${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" && \
+    rm -f "${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" && \
+
+    wget --progress=bar:force "${ALPINE_GLIBC_BASE_URL}/${ALPINE_GLIBC_PACKAGE_VERSION}/${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" && \
+    apk add --no-cache "${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" && \
+    rm -f "${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" && \
+
     /usr/glibc-compat/bin/localedef --force --inputfile en_US --charmap UTF-8 en_US.UTF-8 && \
     echo 'export LANG=en_US.UTF-8' > /etc/profile.d/locale.sh && \
 
     # Cleaning up temporary/unneeded files/packages
     sync && \
     rm -rf \
-        "${ALPINE_GLIBC_BASE_PACKAGE_FILENAME}" \
-        "${ALPINE_GLIBC_BIN_PACKAGE_FILENAME}" \
-        "${ALPINE_GLIBC_I18N_PACKAGE_FILENAME}" \
+        /boot /home /lost+found /media /mnt /run /srv \
+        /usr/share/applications \
         /var/cache/apk/* \
-        /root/.wget-hsts && \
+        /root/.wget-hsts
 
-    # Installing CrashPlan for Small Business
+# Installing CrashPlan for Small Business
+ADD /files/crashplan.exp /files/trim_install.sh /files/move_config.sh /tmp/installation/
+
+RUN CRASHPLAN_VERSION=6.9.2 && \
+    CRASHPLAN_TIMESTAMP=1525200006692 && \
+    CRASHPLAN_BUILD=759 && \
+    CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
+    CRASHPLAN_PATH=/usr/local/crashplan && \
+    CRASHPLAN_INSTALLER_DEPENDENCIES=expect && \
+    apk add --no-cache ${CRASHPLAN_INSTALLER_DEPENDENCIES} && \
     mkdir -p \
         /tmp/crashplan \
         /usr/share/applications \
@@ -88,6 +93,7 @@ RUN CRASHPLAN_VERSION=6.9.2 && \
         /tmp/* \
         ${CRASHPLAN_PATH}/*.pid \
         /config
+
 
 #########################################
 ## SETUP DOCKER WRAPPER FOR CP PROCESS ##
