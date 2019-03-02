@@ -12,6 +12,7 @@ _chkCfgLink() {
         [ -d ${1} ] || mkdir -p ${1}
         [ -d ${2} ] && rm -rf ${2}
     fi
+    [ -d "$(dirname ${2})" ] || mkdir -p "$(dirname ${2})"
     [ -L ${2} ] || ln -s ${1} ${2}
 }
 
