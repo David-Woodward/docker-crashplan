@@ -27,7 +27,7 @@ setupPortProxies() {
             else
                 socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:127.0.0.1:${PUBLIC_PORT} &
             fi
-            sleep .25
+            sleep .5
             kill -0 $! 2>/dev/null && [ -z ${primary_ip} ] && primary_ip=${addr}
         fi
     done
