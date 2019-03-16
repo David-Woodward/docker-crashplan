@@ -1,10 +1,10 @@
 [![](https://img.shields.io/docker/stars/jrcs/crashplan.svg)](https://hub.docker.com/r/jrcs/crashplan 'DockerHub') [![](https://img.shields.io/docker/pulls/jrcs/crashplan.svg)](https://hub.docker.com/r/jrcs/crashplan 'DockerHub')
 [![](https://badge.imagelayers.io/jrcs/crashplan:latest.svg)](https://imagelayers.io/?images=jrcs/crashplan:latest 'Get your own badge on imagelayers.io')
 # docker-crashplan
-Lightweight (243MB) [Crashplan](http://www.crashplan.com) docker container.
+Lightweight (251MB) [Crashplan](http://www.crashplan.com) docker container.
 
 ## Features:
-* Headless CrashPlan for Small Business (6.9.0 - yes it can be managed remotely from your locally installed CrashPlan client just like the old v4.x.x days)
+* Headless CrashPlan for Small Business (6.9.2 - yes it can be managed remotely from your locally installed CrashPlan client just like the old v4.x.x days)
 * Automatic version upgrade
 * Access to all configuration files
 * Access to log files

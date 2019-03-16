@@ -42,9 +42,9 @@ ADD /files /tmp/installation
 # Increase max file watches
 # ADD /files/installation/60-max-user-watches.conf /etc/sysctl.d/60-max-user-watches.conf
 
-RUN CRASHPLAN_VERSION=6.9.0 && \
-    CRASHPLAN_TIMESTAMP=1525200006690 && \
-    CRASHPLAN_BUILD=827 && \
+RUN CRASHPLAN_VERSION=6.9.2 && \
+    CRASHPLAN_TIMESTAMP=1525200006692 && \
+    CRASHPLAN_BUILD=759 && \
     export CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
     chmod +x /tmp/installation/install.sh && \
     sync && \
