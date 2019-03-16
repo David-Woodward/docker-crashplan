@@ -36,7 +36,6 @@ _chkCfgLink /config/bin/run.conf ${SOURCEDIR}/bin/run.conf
 [ ! -L /etc/machine-id ] && ln -sf /config/machine-id /etc/machine-id
 
 # Default values :(
-[ -z ${PUBLIC_IP} ] && export PUBLIC_IP=0.0.0.0
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=4244
 
 # For some reason CrashPlan listens to the port above the one listed in the config
@@ -47,17 +46,16 @@ CFG_LOC_PORT=$(expr ${CFG_SVC_PORT} - 1)
 for cfg in "${SOURCEDIR}/conf/my.service.xml" "${SOURCEDIR}/conf/default.service.xml";
 do
     if [[ -f "${cfg}" ]]; then
-        # Change the public ip/port dynamicaly and
+        # Change the listening ports as needed and
         # force to use the cache in /var/crashplan/cache (see https://goo.gl/LZ8eRY)
-        echo "Configuring CrashPlan to listen on public interface ${PUBLIC_IP}:${PUBLIC_PORT}"
-
-        grep '<location>' "${cfg}" || sed -i -r -e "s@(<config[^>]*>)@\1<location>${PUBLIC_IP}:${CFG_LOC_PORT}</location>@" "${cfg}"
+        grep -q '<location>' "${cfg}" || sed -i -r -e "s|(<config[^>]*>)|\1<location>0.0.0.0:${CFG_LOC_PORT}</location>|" "${cfg}"
+        grep -q '<serviceUIConfig>' "${cfg}" || sed -i -r -e "s|(<config[^>]*>)|\1<serviceUIConfig><servicePort>${CFG_SVC_PORT}</servicePort></serviceUIConfig>|" "${cfg}"
 
         sed -i -r \
-            -e "s/<servicePort>[^<]+/<servicePort>${CFG_SVC_PORT}/g" \
-            -e "s/<location>[^<]+/<location>${PUBLIC_IP}:${CFG_LOC_PORT}/g" \
-            -e "s@<cachePath>[^<]+@<cachePath>/config/cache@g" \
-            -e "s@<manifestPath>[^<]+@<manifestPath>/config/manifest@g" \
+            -e "s|<servicePort>[^<]+|<servicePort>${CFG_SVC_PORT}|g" \
+            -e "s|<location>[^<]+|<location>0.0.0.0:${CFG_LOC_PORT}|g" \
+            -e "s|<cachePath>[^<]+|<cachePath>/config/cache|g" \
+            -e "s|<manifestPath>[^<]+|<manifestPath>/config/manifest|g" \
             "${cfg}"
     fi
 done

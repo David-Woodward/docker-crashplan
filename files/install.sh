@@ -30,12 +30,6 @@ rm -rf /usr/share/applications
 # Patch CrashPlanEngine
 cd "${SOURCEDIR}" && patch -p1 < /tmp/installation/CrashPlanEngine.patch || exit $?
 
-# Bind the UI port 4243 to the container ip (though CrashPlan tries to be tricky and listens one port higher - 4244)
-sed -i "s|</servicePeerConfig>|</servicePeerConfig>\n\t<serviceUIConfig>\n\t\t\
-<serviceHost>0.0.0.0</serviceHost>\n\t\t<servicePort>4243</servicePort>\n\t\t\
-<connectCheck>0</connectCheck>\n\t\t<showFullFilePath>false</showFullFilePath>\n\t\
-</serviceUIConfig>|g" "${SOURCEDIR}/conf/default.service.xml"
-
 # move configuration directories out of the container and capture any defaults created during installation
 mkdir -p /defaults
 
