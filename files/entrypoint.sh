@@ -31,7 +31,7 @@ _link() {
 }
 
 # Update the timezone
-[[ -n "$TZ" ]] && echo "$TZ" > /etc/timezone
+[[ -n "${TZ}" ]] && echo "${TZ}" > /etc/timezone
 
 MOUNTDIR=/var/crashplan
 SOURCEDIR=/usr/local/crashplan
@@ -84,29 +84,29 @@ ln -sf ../conf ${TARGETDIR}/conf
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=4244
 
 # For some reason CrashPlan listens to the port above the one listed in the config
-CFG_SVC_PORT=$(expr $PUBLIC_PORT - 1)
-CFG_LOC_PORT=$(expr $CFG_SVC_PORT - 1)
+CFG_SVC_PORT=$(expr ${PUBLIC_PORT} - 1)
+CFG_LOC_PORT=$(expr ${CFG_SVC_PORT} - 1)
 
 # Update configuration files
 for cfg in "${TARGETDIR}/conf/my.service.xml" "${TARGETDIR}/conf/default.service.xml";
 do
-  if [[ -f "$cfg" ]]; then
+  if [[ -f "${cfg}" ]]; then
       # Change the public ip/port dynamicaly and
       # force to use the cache in /var/crashplan/cache (see https://goo.gl/LZ8eRY)
-      echo "Configuring CrashPlan to listen on public interface $PUBLIC_IP:$PUBLIC_PORT"
+      echo "Configuring CrashPlan to listen on public interface ${PUBLIC_IP}:${PUBLIC_PORT}"
 
-      grep '<location>' "$cfg" || sed -i -r -e "s@(<config[^>]*>)@\1<location>$PUBLIC_IP:$CFG_LOC_PORT</location>@" "$cfg"
+      grep '<location>' "${cfg}" || sed -i -r -e "s@(<config[^>]*>)@\1<location>${PUBLIC_IP}:${CFG_LOC_PORT}</location>@" "${cfg}"
 
       sed -i -r \
-          -e "s/<servicePort>[^<]+/<servicePort>$CFG_SVC_PORT/g" \
-          -e "s/<location>[^<]+/<location>$PUBLIC_IP:$CFG_LOC_PORT/g" \
+          -e "s/<servicePort>[^<]+/<servicePort>${CFG_SVC_PORT}/g" \
+          -e "s/<location>[^<]+/<location>${PUBLIC_IP}:${CFG_LOC_PORT}/g" \
           -e "s@<cachePath>[^<]+@<cachePath>${TARGETDIR}/cache@g" \
-          "$cfg"
+          "${cfg}"
   fi
 done
 
 # Create some links (not needed by crashplan)
-[[ ! -L ${MOUNTDIR}/log ]]  && ln -sf $(basename $TARGETDIR)/log  ${MOUNTDIR}/log
+[[ ! -L ${MOUNTDIR}/log ]]  && ln -sf $(basename ${TARGETDIR})/log  ${MOUNTDIR}/log
 
 sync
 

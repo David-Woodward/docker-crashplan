@@ -17,11 +17,11 @@ trap 'kill "$tail_pid"; \
 /etc/init.d/crashplan start
 
 LOGS_FILES="/var/crashplan/log/service.log.0"
-for file in $LOGS_FILES; do
-	[[ ! -f "$file" ]] && touch $file
+for file in ${LOGS_FILES}; do
+	[[ ! -f "${file}" ]] && touch ${file}
 done
 
-tail -n0 -F $LOGS_FILES &
+tail -n0 -F ${LOGS_FILES} &
 tail_pid=$!
 
 
@@ -42,8 +42,8 @@ done
 
 
 # wait "indefinitely"
-while [[ -e /proc/$tail_pid ]]; do
-    wait $tail_pid # Wait for any signals or end of execution of tail
+while [[ -e /proc/${tail_pid} ]]; do
+    wait ${tail_pid} # Wait for any signals or end of execution of tail
 done
 
 # Stop container properly
