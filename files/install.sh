@@ -2,7 +2,10 @@
 
 set -e
 
-install_deps='expect sed'
+CRASHPLAN_URL=$1
+SOURCEDIR=/usr/local/crashplan
+
+install_deps='expect'
 apk add --update bash openssl findutils coreutils procps libstdc++ rsync $install_deps
 apk add cpio --update-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community/
 
@@ -16,46 +19,62 @@ wget -O- --progress=bar:force ${CRASHPLAN_URL} \
 mkdir -p /usr/share/applications
 cd /tmp/crashplan && chmod +x /tmp/installation/crashplan.exp && sync && /tmp/installation/crashplan.exp || exit $?
 echo
+
+# Stop CrashPlan if it actually started
+/etc/init.d/crashplan stop || true
+sleep 2
+
 cd / && rm -rf /tmp/crashplan
 rm -rf /usr/share/applications
 
 # Patch CrashPlanEngine
-cd /usr/local/crashplan && patch -p1 < /tmp/installation/CrashPlanEngine.patch || exit $?
+cd "${SOURCEDIR}" && patch -p1 < /tmp/installation/CrashPlanEngine.patch || exit $?
 
 # Bind the UI port 4243 to the container ip (though CrashPlan tries to be tricky and listens one port higher - 4244)
 sed -i "s|</servicePeerConfig>|</servicePeerConfig>\n\t<serviceUIConfig>\n\t\t\
 <serviceHost>0.0.0.0</serviceHost>\n\t\t<servicePort>4243</servicePort>\n\t\t\
 <connectCheck>0</connectCheck>\n\t\t<showFullFilePath>false</showFullFilePath>\n\t\
-</serviceUIConfig>|g" /usr/local/crashplan/conf/default.service.xml
+</serviceUIConfig>|g" "${SOURCEDIR}/conf/default.service.xml"
+
+# move configuration directories out of the container and capture any defaults created during installation
+mkdir -p /defaults
+
+SOURCEDIR=/usr/local/crashplan
+
+[ -d ${SOURCEDIR}/conf ] && mv -f ${SOURCEDIR}/conf /defaults
+[ -f ${SOURCEDIR}/bin/run.conf ] && mv -f ${SOURCEDIR}/bin/run.conf /defaults
+[ -d ${SOURCEDIR}/cache ] && mv -f ${SOURCEDIR}/cache /defaults
+[ -d ${SOURCEDIR}/log ] && mv -f ${SOURCEDIR}/log /defaults
+[ -d /var/lib/crashplan ] && mv -f /var/lib/crashplan /defaults/var
+[ -d ${SOURCEDIR}/metadata ] && mv -f ${SOURCEDIR}/metadata /defaults
+[ -d /config/manifest ] && mv -f /config/manifest /defaults
 
 # Install launchers
-cp /tmp/installation/entrypoint.sh /tmp/installation/crashplan.sh /
-chmod +rx /entrypoint.sh /crashplan.sh
+mv /tmp/installation/entrypoint.sh /tmp/installation/crashplan.sh /tmp/installation/headless-init.sh /
 
 # Remove unneccessary package
 apk del $install_deps
 
 # Remove unneccessary files and directories
-rm -rf /usr/local/crashplan/*.pid \
-   /usr/local/crashplan/log \
-   /usr/local/crashplan/cache \
-   /usr/local/crashplan/electron \
-   /usr/local/crashplan/jre/lib/plugin.jar \
-   /usr/local/crashplan/jre/lib/ext/jfxrt.jar \
-   /usr/local/crashplan/jre/bin/javaws \
-   /usr/local/crashplan/jre/lib/javaws.jar \
-   /usr/local/crashplan/jre/lib/desktop \
-   /usr/local/crashplan/jre/plugin \
-   /usr/local/crashplan/jre/lib/deploy* \
-   /usr/local/crashplan/jre/lib/*javafx* \
-   /usr/local/crashplan/jre/lib/*jfx* \
-   /usr/local/crashplan/jre/lib/amd64/libdecora_sse.so \
-   /usr/local/crashplan/jre/lib/amd64/libprism_*.so \
-   /usr/local/crashplan/jre/lib/amd64/libfxplugins.so \
-   /usr/local/crashplan/jre/lib/amd64/libglass.so \
-   /usr/local/crashplan/jre/lib/amd64/libgstreamer-lite.so \
-   /usr/local/crashplan/jre/lib/amd64/libjavafx*.so \
-   /usr/local/crashplan/jre/lib/amd64/libjfx*.so
+rm -rf ${SOURCEDIR}/*.pid \
+   ${SOURCEDIR}/electron \
+   ${SOURCEDIR}/jre/lib/plugin.jar \
+   ${SOURCEDIR}/jre/lib/ext/jfxrt.jar \
+   ${SOURCEDIR}/jre/bin/javaws \
+   ${SOURCEDIR}/jre/lib/javaws.jar \
+   ${SOURCEDIR}/jre/lib/desktop \
+   ${SOURCEDIR}/jre/plugin \
+   ${SOURCEDIR}/jre/lib/deploy* \
+   ${SOURCEDIR}/jre/lib/*javafx* \
+   ${SOURCEDIR}/jre/lib/*jfx* \
+   ${SOURCEDIR}/jre/lib/amd64/libdecora_sse.so \
+   ${SOURCEDIR}/jre/lib/amd64/libprism_*.so \
+   ${SOURCEDIR}/jre/lib/amd64/libfxplugins.so \
+   ${SOURCEDIR}/jre/lib/amd64/libglass.so \
+   ${SOURCEDIR}/jre/lib/amd64/libgstreamer-lite.so \
+   ${SOURCEDIR}/jre/lib/amd64/libjavafx*.so \
+   ${SOURCEDIR}/jre/lib/amd64/libjfx*.so \
+   /config
 
 rm -rf /boot /home /lost+found /media /mnt /run /srv
 rm -rf /var/cache/apk/*

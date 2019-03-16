@@ -17,9 +17,9 @@ expect "What directory do you wish to link the CrashPlan executable to?"
 send "/usr/local/bin\r"
 
 expect "What directory do you wish to store incoming backup data?"
-send "/storage\r"
+send "/config/manifest\r"
 
-expect "/storage does not exist.  Create /storage?"
+expect "does not exist.  Create"
 send "y\r"
 
 expect "What directory contains your SYSV init scripts?"
