@@ -1,4 +1,5 @@
 # Headless CrashPlan for Small Business Docker Image
+[![](https://img.shields.io/docker/stars/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![](https://img.shields.io/docker/pulls/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![](https://images.microbadger.com/badges/image/woodwarden/crashplan-headless.svg)](https://microbadger.com/images/woodwarden/crashplan-headless "How's that for lightweight?") [![](https://img.shields.io/badge/buy%20me%20a%20coffee-PayPal-green.svg)](https://www.paypal.me/techdude/4.01usd 'Caffeinate, Code, Repeat')
 
 (Yes, this still works for CrashPlan 6.9.2)
 
