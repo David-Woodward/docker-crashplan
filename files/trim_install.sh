@@ -6,6 +6,7 @@ set -e
 
 rm -rf \
 ${CRASHPLAN_PATH}/upgrade \
+${CRASHPLAN_PATH}/upgrade.cpi \
 ${CRASHPLAN_PATH}/electron \
 ${CRASHPLAN_PATH}/jre/lib/plugin.jar \
 ${CRASHPLAN_PATH}/jre/lib/ext/jfxrt.jar \

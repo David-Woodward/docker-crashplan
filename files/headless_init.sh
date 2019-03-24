@@ -48,6 +48,24 @@ cleanup_procs '(socat|inotify)'
 #
 echo "Waiting for the CrashPlan service to initialize ..."
 
+# If KEEP_APP_RUNNING=1 then the inotify event that spawned this process will likely
+# be the most timely/efficient way to restart the service when it stops.
+if [ "${KEEP_APP_RUNNING}" == "1" ] && /etc/init.d/crashplan status | grep -q 'stopped' && ( [ ! -d "${CRASHPLAN_PATH}/upgrade" ] || ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 ); then
+    secs=0
+    while [ ${secs} -lt $(expr ${CRASH_RESPONSE_DELAY} '*' 2) ]
+    do
+        sleep .5
+        /etc/init.d/crashplan status | grep -q 'stopped' || break
+        [ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 && break
+        secs=$(expr ${secs} + 1)
+    done
+    if /etc/init.d/crashplan status | grep -q 'stopped' && ( [ ! -d "${CRASHPLAN_PATH}/upgrade" ] || ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 ); then
+        echo 'The CrashPlan service has stopped - restarting it now'
+        /app/run_prep.sh
+        su cpuser /etc/init.d/crashplan start
+    fi
+fi
+
 # Get the possible ports from the config file, ports being listened to by java, and PUBLIC_PORT
 cfg="${CRASHPLAN_PATH}/conf/my.service.xml"
 
@@ -56,7 +74,7 @@ svc_port="$(sed -rn 's/.*<servicePort>([0-9]+)<\/servicePort>.*/\1/p' ${cfg})"
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=${ui_port##*:}
 
 # Capture the CP version from the log file
-cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' /usr/local/crashplan/log/history.log.0  | tail -1)"
+cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log.0" | tail -1)"
 echo "${cp_version}" > /config/cp_version
 
 
@@ -109,9 +127,9 @@ else
 fi
 
 # Run this process again if the service is restarted
-inotifyd '/headless_init.sh' /usr/local/crashplan/CrashPlanEngine.pid:x &
+inotifyd '/app/headless_init.sh' "${CRASHPLAN_PATH}/CrashPlanEngine.pid":x &
 
 # Use a while loop for Ubuntu based Docker images
-#inotifywait -e delete_self /usr/local/crashplan/CrashPlanEngine.pidi || break
+#inotifywait -e delete_self "${CRASHPLAN_PATH}/CrashPlanEngine.pid" || break
 #done
 #term_handler
