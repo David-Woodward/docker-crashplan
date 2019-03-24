@@ -7,6 +7,9 @@ spawn "/tmp/crashplan/install.sh"
 expect "Press enter to continue with installation."
 send "\r"
 
+#expect "Would you like to switch users and install as root?"
+#send "n\r"
+
 expect "What parent directory do you wish to install CrashPlan into?"
 send "/usr/local\r"
 

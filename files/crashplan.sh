@@ -6,7 +6,7 @@ CP_PID_FILE="${CRASHPLAN_PATH}/CrashPlanEngine.pid"
 
 crashplan() {
     /app/run_prep.sh
-    /etc/init.d/crashplan ${1}
+    su cpuser /etc/init.d/crashplan ${1}
     CP_PID="$(cat "${CP_PID_FILE}")"
 }
 
@@ -36,7 +36,7 @@ crashplan start
 
 for file in $(echo ${LOG_FILES} | tr ',' ' '); do
     full_path="${CRASHPLAN_PATH}/log/${file}"
-    [ ! -f "${full_path}" ] && touch "${full_path}"
+    [ ! -f "${full_path}" ] && touch "${full_path}" && chown cpuser:${GROUP_ID} "${full_path}"
     FULLPATH_LOG_FILES="${full_path} ${FULLPATH_LOG_FILES}"
 done
 

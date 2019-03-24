@@ -61,13 +61,17 @@ done
 
 [ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -la "${CRASHPLAN_PATH}/upgrade/"* > /dev/null 2>&1 && [ "${CLEAN_UPGRADES}" == "1" ] && /app/trim_install.sh && /app/patch_install.sh
 
+# Take ownership of the crashplan & mounted volumes to prevent access problems running under a non-root user
+chown -R cpuser:${GROUP_ID} ${CRASHPLAN_PATH} /etc/init.d /etc/rc.d
+find ${VOL} -mindepth 1 -exec chown -R cpuser:${GROUP_ID} {} \;
+
 # Block upgrades if configured
 if [ "${BLOCK_UPGRADES}" == "1" ]; then
     [ -d "${CRASHPLAN_PATH}/upgrade" ] && mv -f "${CRASHPLAN_PATH}/upgrade" "${DEFAULTS}"
     [ -d "${CRASHPLAN_PATH}/upgrade" ] && rm -rf "${CRASHPLAN_PATH}/upgrade"
-    [ ! -d "${CRASHPLAN_PATH}/upgrade" ] && touch "${CRASHPLAN_PATH}/upgrade" && chmod 400 "${CRASHPLAN_PATH}/upgrade"
+    [ ! -d "${CRASHPLAN_PATH}/upgrade" ] && touch "${CRASHPLAN_PATH}/upgrade" && chmod 400 "${CRASHPLAN_PATH}/upgrade" && chown root:root "${CRASHPLAN_PATH}/upgrade"
 else
-    [ -f "${CRASHPLAN_PATH}/upgrade" ] && rm -f "${CRASHPLAN_PATH}/upgrade" && [ -d "${DEFAULTS}/upgrade" ] && mv "${DEFAULTS}/upgrade" "${CRASHPLAN_PATH}"
+    [ -f "${CRASHPLAN_PATH}/upgrade" ] && rm -f "${CRASHPLAN_PATH}/upgrade" && [ -d "${DEFAULTS}/upgrade" ] && mv "${DEFAULTS}/upgrade" "${CRASHPLAN_PATH}" && chown -R cpuser:${GROUP_ID} "${CRASHPLAN_PATH}/upgrade"
 fi
 
 # Remove the old PID

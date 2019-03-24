@@ -8,6 +8,8 @@
 [ -z ${KEEP_APP_RUNNING} ] && export KEEP_APP_RUNNING=1
 [ -z ${STOP_CONTAINER_WITH_APP} ] && export STOP_CONTAINER_WITH_APP=0
 [ -z ${CRASH_RESPONSE_DELAY} ] && export CRASH_RESPONSE_DELAY=30
+[ -z ${USER_ID} ] && export USER_ID=0
+[ -z ${GROUP_ID} ] && export GROUP_ID=0
 [ -z ${BLOCK_UPGRADES} ] && export BLOCK_UPGRADES=1
 [ -z ${CLEAN_UPGRADES} ] && export CLEAN_UPGRADES=0
 [ -z ${LOG_FILES} ] && export LOG_FILES='history.log.0'
@@ -40,5 +42,38 @@ fi
 [ -f ${VOL}/machine-id ] || cat /proc/sys/kernel/random/uuid | tr -d '-' > ${VOL}/machine-id
 [ -f /etc/machine-id ] && rm -f /etc/machine-id
 [ -L /etc/machine-id ] || ln -sf ${VOL}/machine-id /etc/machine-id
+
+
+#
+# Setup the CrashPlan user/group with the configured user/group ID (root by default)
+#
+
+# Remove the nobody user if CrashPlan will be using it
+if [ "${USER_ID}" == "$(grep -E '^nobody:' /etc/passwd | cut -d':' -f3)" ]; then
+    sed -i -r -e '/^nobody:/d' /etc/passwd
+    sed -i -r -e '/^nobody:/d' /etc/shadow
+fi
+
+# Remove any previously created user/groups
+sed -i -r -e '/^cpuser:/d' /etc/passwd
+sed -i -r -e "s/^([^:]+:[^:]+:[0-9]:.*)(,?cpuser)(,|$)/\1\3/g" -e '/^cpgroup[0-9]+:/d' /etc/group
+
+# Add cpuser
+echo "cpuser:x:${USER_ID}:${GROUP_ID}::/config:" >> /etc/passwd
+
+# Add cpuser to any existing groups that match the IDs in GROUP_ID and SUP_GROUP_IDS and create dummy groups for IDs that aren't matched
+group_num=0
+for gid in $GROUP_ID $(echo ${SUP_GROUP_IDS} | tr ',' ' ')
+do
+    if grep -q -E "^[^:]+:[^:]+:${gid}:" /etc/group; then
+        [ "${GROUP_ID}" != "${gid}" ] && sed -i -r -e "s/^([^:]+:[^:]+:${gid}:.+)$/\1,cpuser/g" -e "s/^([^:]+:[^:]+:${gid}:)$/\1cpuser/g" /etc/group
+    elif [ "${GROUP_ID}" == "${gid}" ]; then
+        group_num=$(expr ${group_num} + 1)
+        echo "cpgroup${group_num}:x:${gid}" >> /etc/group
+    else
+        group_num=$(expr ${group_num} + 1)
+        echo "cpgroup${group_num}:x:${gid}:cpuser" >> /etc/group
+    fi
+done
 
 exec $@
