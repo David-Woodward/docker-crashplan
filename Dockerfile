@@ -114,6 +114,19 @@ VOLUME [ "/config" ]
 #########################################
 EXPOSE 4244
 
+#########################################
+##         MICROBADGER LABELS          ##
+#########################################
+ARG BUILD_DATE=unknown
+ARG VERSION=unknown
+LABEL \
+    org.label-schema.build-date=${BUILD_DATE} \
+    org.label-schema.version=${VERSION} \
+    org.label-schema.name="CrashPlan-Headless" \
+    org.label-schema.description="A Docker image for running CrashPlan in headless environments" \
+    org.label-schema.vcs-url="https://github.com/David-Woodward/docker-crashplan-headless" \
+    org.label-schema.schema-version="1.0"
+
 WORKDIR /usr/local/crashplan
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]

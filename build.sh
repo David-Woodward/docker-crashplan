@@ -130,7 +130,7 @@ if [ "${BUILD}" == "1" ]; then
     echo "(Last version = ${last_tag})"
     echo ""
 
-    if docker build "${SCRIPTDIR}" -t "${REPOSITORY}:v${cp_version}__${new_tag}"; then
+    if docker build "${SCRIPTDIR}" --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --build-arg VERSION="v${cp_version}__${new_tag}" -t "${REPOSITORY}:v${cp_version}__${new_tag}"; then
         if [ "${LATEST}" == "1" ]; then
             docker tag "${REPOSITORY}:v${cp_version}__${new_tag}" "${REPOSITORY}:latest"
         elif [ ${new_major} -gt ${last_major} ] || ([ ${new_major} -eq ${last_major} ] && [ ${new_minor} -gt ${last_minor} ]); then
