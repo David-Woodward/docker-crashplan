@@ -63,7 +63,9 @@ done
 # Block upgrades if configured
 
 if [ "${BLOCK_UPGRADES}" == "1" ]; then
-    [ -d "${SOURCEDIR}/upgrade" ] && mv -f "${SOURCEDIR}/upgrade" "${DEFAULTSDIR}" && touch "${SOURCEDIR}/upgrade" && chmod 400 "${SOURCEDIR}/upgrade"
+    [ -d "${SOURCEDIR}/upgrade" ] && mv -f "${SOURCEDIR}/upgrade" "${DEFAULTSDIR}"
+    [ -d "${SOURCEDIR}/upgrade" ] && rm -rf "${SOURCEDIR}/upgrade"
+    [ ! -d "${SOURCEDIR}/upgrade" ] && touch "${SOURCEDIR}/upgrade" && chmod 400 "${SOURCEDIR}/upgrade"
 else
     [ -f "${SOURCEDIR}/upgrade" ] && rm -f "${SOURCEDIR}/upgrade" && [ -d "${DEFAULTSDIR}/upgrade" ] && mv "${DEFAULTSDIR}/upgrade" "${SOURCEDIR}"
 fi

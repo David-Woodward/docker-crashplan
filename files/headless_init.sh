@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /app/cleanup.sh
+
 setupPortProxies() {
     for addr in ${1}
     do
@@ -24,14 +26,21 @@ getInterfaceIPs() {
         '
 }
 
+#SIGTERM-handler
+term_handler() {
+    cleanup_procs '(socat|inotify)'
+
+    exit 143; # 128 + 15 -- SIGTERM
+}
+
+
+trap 'term_handler' INT QUIT KILL TERM
+
 # Use a while loop for Ubuntu based Docker images
 #while true; do
 
-# Kill any old socat instances
-for socat_pid in $(ps -o pid,cmd -U root | grep -v grep | grep socat | sed -rn 's/\s*([0-9]+).*/\1/p')
-do
-    kill ${socat_pid};
-done
+# Kill any old processes still running from the last execution of this script
+cleanup_procs '(socat|inotify)'
 
 
 #
@@ -103,5 +112,6 @@ fi
 inotifyd '/headless_init.sh' /usr/local/crashplan/CrashPlanEngine.pid:x &
 
 # Use a while loop for Ubuntu based Docker images
-#inotifywait -e delete_self /usr/local/crashplan/CrashPlanEngine.pid
+#inotifywait -e delete_self /usr/local/crashplan/CrashPlanEngine.pidi || break
 #done
+#term_handler
