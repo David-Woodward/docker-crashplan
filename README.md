@@ -193,6 +193,20 @@ When backing up large data sets the following two issues often arise:
 
 Upgrades are intentionally disabled by default to prevent problems created by new CrashPlan versions that may be difficult to recover from.  The recommended upgrade process is to wait for the new version of CrashPlan to be tested and implemented in a new version of the Docker image and then use the steps documented in the [Docker Image Updates](#docker-image-updates) section to upgrade to the new Docker image.  Alternately, automatic upgrades can be enabled by setting the `BLOCK_UPGRADES` variable to `0` with the understanding that this convenience comes at the risk of rendering the container unusable or incompatible with future image updates.
 
+### Using Older Versions
+A typical Docker pull/install of this image will reference the `latest` tag rather than a version number.  However, if an older version must be pulled/installed for some reason, it should be noted that the version number/tags for this Docker image uses the following syntax: v`<CrashPlan version>`\_\_`<image version>`
+
+For example, *v6.9.2\_\_1.0.0* indicates that the version of CrashPlan included in the image is 6.9.2 and that the version of the Docker image is 1.0.0.
+
+The components of the Docker image version number are `major#.minor#.build#`:
+
+- **major#:** This number is incremented when a significant change has occurred that may affect compatibility or depreciate older legacy functionality
+- **minor#:** This number is incremented when new functionality has been added but it should not affect current features or compatibility
+- **build#:** This number is incremented on each build and is essentially an arbitrary number to act as an indicator that small bug fixes and other inconsequential updates were made
+  * Note that the build number is incremented with each build rather than each release.  Therefore, the build number may jump/skip numbers in the sequence without explanation when viewing releases/tags - this is no cause for concern.
+
+Due to the minimalist design/goals of this Docker image, it is antipated that only the CrashPlan version number will change for most releases/tags.  It should also be noted that only the most recent Docker image version will be supported and future versions of CrashPlan will not be retroactively built into previous Docker image versions.  However, it is possible that the version of CrashPlan installed in a Docker container based off of an older image can be upgraded by the end user by means of setting the `BLOCK_UPGRADES` varialbe to `0` (see the [Environment Variables](#environment-variables) section for more details).
+
 ## Support
 
 Please [create a new issue](https://github.com/David-Woodward/docker-crashplan-headless/issues) if you believe you've identified a bug or area for improvement.  Or if you're feeling really generous, feel free to fork the image repository, fix the bug, and create a pull request.
