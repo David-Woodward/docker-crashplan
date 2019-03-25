@@ -10,8 +10,6 @@ This docker image is provided for educational purposes only to aid in developmen
 
 The developers of CrashPlan, [Code42](https://code42.com), have explicitly stated that use of CrashPlan in a headless environment (or on a NAS) is [not supported](https://support.code42.com/CrashPlan/4/Configuring/Use_CrashPlan_on_a_headless_computer) and have recently gone a step further making [changes in version 6.6.0](https://support.code42.com/Release_Notes/CrashPlan_for_Small_Business_version_6.6) to ~~remove~~ hide the headless functionality.  This Docker image demonstrates that these changes were not likely to have been made due to any technical limitation of the CrashPlan software since restoring the headless functionality can be achieved using simple command line networking tools - no modification to the CrashPlan software is necessary.  It's more probable that hiding headless functionality was a business decision made in an effort to eliminate the overhead of headless/NAS users (too much data?  too many support calls?).  So, although this image could be used to allow continued use of CrashPlan on a NAS or in another headless environment, it would be wise to consider this a temporary measure at best.  Recognizing Code42's growing intollerance for headless/NAS installations, it may be time to look at other *supported* solutions for backing up your data.
 
----
-
 # Description
 A lightweight (251MB) Crashplan Docker image supporting headless operations from a CrashPlan client running on a remote system.  For example, using this Docker image, CrashPlan services can run directly on a Synology NAS and then can be configured/controlled from a standard CrashPlan installation on a Windows laptop.
 
@@ -19,14 +17,10 @@ This Docker image is an amalgamation of two other well known Docker images: [JrC
 
 Since this image is based off of the JrCs image and is intended to mimic the jlesage image as closely as possible, it is likely that it can be used in many of the same environments as those images.  However, it has currently only been tested on a Synology NAS.
 
----
-
 # Educational Use
 The minimalist design concepts used in this Docker image make it well suited for demonstrating how easy it is to create your own Docker images.  Containing only roughly 650 lines of shell script, an official Alpine Linux base image, and a handful of Alpine pkg installs, you could easily perform your own code review of this image in an afternoon (unless you want to review through the Apline/pkg sources also ... good luck).
 
 **NOTE:** The build script/process is tailored for use directly on a Synology NAS which does not natively include some of the more common development tools like [make](https://www.gnu.org/software/make/).  This does slightly reduce the value of the Docker image as a teaching aid, but it also lowers the barrier to entry for building and testing on a Synology NAS since it will only require SSH access to the NAS to get started. 
-
----
 
 # Usage
 
