@@ -8,9 +8,17 @@ setupPortProxies() {
         if [ "${addr}" != '127.0.0.1' ] && [ "${addr}" != '::1' ]; then
             echo "Creating a port proxy between ${addr}:${PUBLIC_PORT} and ${ui_port} ..."
             if [ -z "${addr##*:*}" ]; then
-                socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                if [ "${addr}" == "${PUBLIC_IP}" ] && ! ifconfig 2>&1 | grep -q "${addr}"; then
+                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} > /dev/null 2>&1 &
+                else
+                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                fi
             else
-                socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                if [ "${addr}" == "${PUBLIC_IP}" ] && ! ifconfig 2>&1 | grep -q "${addr}"; then
+                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} > /dev/null 2>&1 &
+                else
+                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                fi
             fi
             sleep .5
             kill -0 $! 2>/dev/null && [ -z ${primary_ip} ] && primary_ip=${addr}
