@@ -30,6 +30,19 @@ docker_login() {
     fi
 }
 
+greater_ver() {
+
+    major1=$1
+    minor1=$2
+    build1=$3
+
+    major2=$4
+    minor2=$5
+    build2=$6
+
+    [ ${major1} -gt ${major2} ] || ([ ${minor1} -gt ${minor2} ] && [ ${major1} -eq ${major2} ]) || ([ ${build1} -gt ${build2} ] && [ "${major1}.${minor1}" == "${major2}.${minor2}" ])
+}
+
 git_tag_and_push() {
     echo "
 
@@ -95,7 +108,7 @@ last_type=''
 # Get the highest local image version number
 while read -r cur_tag cur_ver cur_major cur_minor cur_build cur_type
 do
-    if [ ${cur_major} -gt ${last_major} ] || ([ ${cur_minor} -gt ${last_minor} ] && [ ${cur_major} -eq ${last_major} ]) || ([ ${cur_build} -gt ${last_build} ] && [ "${cur_major}.${cur_minor}" == "${last_major}.${last_minor}" ]); then
+    if greater_ver ${cur_major} ${cur_minor} ${cur_build} ${last_major} ${last_minor} ${last_build}; then
         last_tag=${cur_tag}
         last_ver=${cur_ver}
         last_major=${cur_major}
@@ -133,7 +146,7 @@ if [ "${BUILD}" == "1" ]; then
     if docker build "${SCRIPTDIR}" -t "${REPOSITORY}:v${cp_version}__${new_tag}"; then
         if [ "${LATEST}" == "1" ]; then
             docker tag "${REPOSITORY}:v${cp_version}__${new_tag}" "${REPOSITORY}:latest"
-        elif [ ${new_major} -gt ${last_major} ] || ([ ${new_major} -eq ${last_major} ] && [ ${new_minor} -gt ${last_minor} ]); then
+        elif greater_ver ${new_major} ${new_minor} ${new_build} ${last_major} ${last_minor} ${last_build}; then
             docker tag "${REPOSITORY}:v${cp_version}__${new_tag}" "${REPOSITORY}:latest"
         else
             docker tag "${REPOSITORY}:v${cp_version}__${new_tag}" "${REPOSITORY}:legacy"
