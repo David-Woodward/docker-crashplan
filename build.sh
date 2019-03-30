@@ -48,7 +48,7 @@ git_tag_and_push() {
 
 The git repository should be updated to match the docker repository with commands similar to:
 git tag -s \"v${cp_version}__${new_tag}\" -m \"Changes for CrashPlan version ${cp_version}\"
-git push origin \"v${cp_version}__${new_tag}\"
+git push origin --follow-tags
 "
 }
 
