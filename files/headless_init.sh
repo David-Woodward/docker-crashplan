@@ -3,25 +3,28 @@
 source /app/cleanup.sh
 
 setupPortProxies() {
+    socat_dest="TCP:${ui_port}"
+    [ "${ui_port##*:}" == "${ui_port#*:}" ] || socat_dest="TCP6:[${ui_port%:*}]:${ui_port##*:}"
+
     for addr in ${1}
     do
         if [ "${addr}" != '127.0.0.1' ] && [ "${addr}" != '::1' ]; then
             echo "Creating a port proxy between ${addr}:${PUBLIC_PORT} and ${ui_port} ..."
             if [ -z "${addr##*:*}" ]; then
                 if [ "${addr}" == "${PUBLIC_IP}" ] && ! ifconfig 2>&1 | grep -q "${addr}"; then
-                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} > /dev/null 2>&1 &
+                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=[${addr}] ${socat_dest} > /dev/null 2>&1 &
                 else
-                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                    socat TCP6-LISTEN:${PUBLIC_PORT},fork,bind=[${addr}] ${socat_dest} &
                 fi
             else
                 if [ "${addr}" == "${PUBLIC_IP}" ] && ! ifconfig 2>&1 | grep -q "${addr}"; then
-                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} > /dev/null 2>&1 &
+                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} ${socat_dest} > /dev/null 2>&1 &
                 else
-                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} TCP:${ui_port} &
+                    socat TCP4-LISTEN:${PUBLIC_PORT},fork,bind=${addr} ${socat_dest} &
                 fi
             fi
             sleep .5
-            kill -0 $! 2>/dev/null && [ -z ${primary_ip} ] && primary_ip=${addr}
+            kill -0 $! 2>/dev/null && ([ -z ${primary_ip} ] || ([ -z ${primary_ip##*:*} ] && [ ! -z ${addr##*:*} ])) && primary_ip=${addr}
         fi
     done
 }
