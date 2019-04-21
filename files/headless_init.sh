@@ -79,12 +79,18 @@ fi
 # Get the possible ports from the config file, ports being listened to by java, and PUBLIC_PORT
 cfg="${CRASHPLAN_PATH}/conf/my.service.xml"
 
+# Wait for the CrashPlan java process to start listening on any port and record that as the ui port
 while ui_port="$(netstat -ltnp 2>/dev/null | grep 'java' | head -n 1 | awk '{ print $4 }')" && [ -z ${ui_port} ]; do sleep .5; done
 svc_port="$(sed -rn 's/.*<servicePort>([0-9]+)<\/servicePort>.*/\1/p' ${cfg})"
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=${ui_port##*:}
 
 # Capture the CP version from the log file
 cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log.0" | tail -1)"
+
+# Clean/patch completed upgrades if specified by ${CLEAN_UPGRADES}
+[ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -la "${CRASHPLAN_PATH}/upgrade/"* > /dev/null 2>&1 && ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 && [ "${CLEAN_UPGRADES}" == "1" ] && [ "${cp_version}" != "$(cat /config/cp_version)" ] && /app/trim_install.sh && /app/patch_install.sh
+
+# Record cp_version for upgrade detection
 echo "${cp_version}" > /config/cp_version
 
 
