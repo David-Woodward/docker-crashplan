@@ -1,7 +1,7 @@
 # Headless CrashPlan for Small Business Docker Image
 [![](https://img.shields.io/docker/stars/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![](https://img.shields.io/docker/pulls/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![](https://img.shields.io/docker/cloud/build/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![](https://images.microbadger.com/badges/image/woodwarden/crashplan-headless.svg)](https://microbadger.com/images/woodwarden/crashplan-headless "How's that for lightweight?") [![](https://img.shields.io/badge/buy%20me%20a%20coffee-PayPal-green.svg)](https://www.paypal.me/techdude/4.01usd 'Caffeinate, Code, Repeat')
 
-(Yes, this still works for CrashPlan 6.9.2)
+(Yes, this still works for CrashPlan 6.9.4)
 
 # Disclaimers
 **IMPORTANT: DO NOT CONTACT CODE42 FOR SUPPORT USING CRASHPLAN WITH THIS DOCKER IMAGE**
@@ -13,7 +13,7 @@ This docker image is provided for educational purposes only to aid in developmen
 The developers of CrashPlan, [Code42](https://code42.com), have explicitly stated that use of CrashPlan in a headless environment (or on a NAS) is [not supported](https://support.code42.com/CrashPlan/4/Configuring/Use_CrashPlan_on_a_headless_computer) and have recently gone a step further making [changes in version 6.6.0](https://support.code42.com/Release_Notes/CrashPlan_for_Small_Business_version_6.6) to ~~remove~~ hide the headless functionality.  This Docker image demonstrates that these changes were likely made as a business decision rather than for technicial reasons since restoring the headless functionality can be achieved using simple command line networking tools - no modification to the CrashPlan software is necessary.  So, although this image could be used to allow continued use of CrashPlan in a headless environment, it would be wise to consider this a temporary measure at best.  Recognizing Code42's growing intollerance for headless/NAS installations, it may be time to look at other *supported* solutions for backing up your data.
 
 # Description
-A lightweight (251MB) Crashplan Docker image supporting headless operations from a CrashPlan client running on a remote system.  For example, using this Docker image, CrashPlan services can run directly on a Synology NAS and then can be configured/controlled from a standard CrashPlan installation on a Windows laptop.
+A lightweight (233MB) Crashplan Docker image supporting headless operations from a CrashPlan client running on a remote system.  For example, using this Docker image, CrashPlan services can run directly on a Synology NAS and then can be configured/controlled from a standard CrashPlan installation on a Windows laptop.
 
 This Docker image is an amalgamation of two other well known Docker images: [JrCs/crashplan](https://github.com/JrCs/docker-crashplan) and [jlesage/crashplan-pro](https://github.com/jlesage/docker-crashplan-pro).  The image has the lightweight/headless operation of the older JrCs image, but uses the volume/directory structure used by the more recent jlesage image.  This allows for easy migration to a jlesage container if needed (for example if future CrashPlan releases include changes that prevent the techniques used by this image to allow headless operations).  The image does support running under the old JrCs volume/directory structure to allow for initial testing by users who are currently using a JrCs based container, but it is recommended that containers based on this image be run with the new jlesage volume (/config) as support and the JrCs volume (/var/crashplan) may be dropped from future versions.
 
@@ -66,6 +66,8 @@ docker run --detach \
     /volume1/docker/crashplan-headless/var/service.pem --> C:\ProgramData\CrashPlan
     ```
 - Start the local CrashPlan GUI (if the CrashPlan GUI fales to connect to the headless instance after a minute or so, you may need to kill all CrashPlan instances on your client system or reboot and then start the GUI again).
+
+**NOTE**: This process will likely need to be repeated any time you update the CrashPlan client on the system used to manage the headless CrashPlan installation.  However, for minor upgrades to the CrashPlan Docker image (ie. 6.9.2 -> 6.9.4), the CrashPlan client on the managing system does not necessarily need to be upgraded.  Refer to the [CrashPlan release notes](https://support.code42.com/Release_Notes/CrashPlan_for_Small_Business_release_notes) to determine if any changes were made that would necessitate a client upgrade.
 
 ## Basic Docker Command Syntax
 
@@ -197,7 +199,7 @@ Upgrades are intentionally disabled by default to prevent problems created by ne
 ### Using Older Versions
 A typical Docker pull/install of this image will reference the `latest` tag rather than a version number.  However, if an older version must be pulled/installed for some reason, it should be noted that the version number/tags for this Docker image uses the following syntax: v`<CrashPlan version>`\_\_`<image version>`
 
-For example, *v6.9.2\_\_1.0.0* indicates that the version of CrashPlan included in the image is 6.9.2 and that the version of the Docker image is 1.0.0.
+For example, *v6.9.4\_\_1.0.7* indicates that the version of CrashPlan included in the image is 6.9.4 and that the version of the Docker image is 1.0.7.
 
 The components of the Docker image version number are `major#.minor#.build#`:
 
