@@ -50,14 +50,13 @@ trap 'term_handler' INT QUIT KILL TERM
 # Use a while loop for Ubuntu based Docker images
 #while true; do
 
-# Kill any old processes still running from the last execution of this script
-cleanup_procs '(socat|inotify)'
-
-
 #
 # Wait for CrashPlan to start and capture the version from the log file
 #
 echo "Waiting for the CrashPlan service to initialize ..."
+
+# Kill any old processes still running from the last execution of this script
+cleanup_procs '(socat|inotify)'
 
 # If KEEP_APP_RUNNING=1 then the inotify event that spawned this process will likely
 # be the most timely/efficient way to restart the service when it stops.
