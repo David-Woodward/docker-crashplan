@@ -34,7 +34,13 @@ _chkCfgLink ${VOL}/conf ${CRASHPLAN_PATH}/conf
 _chkCfgLink ${CP_RESOURCES}/log ${CRASHPLAN_PATH}/log
 _chkCfgLink ${CP_RESOURCES}/cache ${CRASHPLAN_PATH}/cache
 _chkCfgLink ${CP_RESOURCES}/manifest ${CRASHPLAN_PATH}/manifest
-_chkCfgLink ${CP_RESOURCES}/bin/run.conf ${CRASHPLAN_PATH}/bin/run.conf
+
+# The memory usage setting was moved into the my.services.xml file for use with the native service as of 7.0.0
+# (run.conf mod is no longer needed - the file is only preserved for rollback purposes)
+if [ -f "${CP_RESOURCES}/bin/run.conf" ]; then
+    [ -f "${DEFAULTS}/run.conf" ] || cp -p "${CP_RESOURCES}/bin/run.conf" "${DEFAULTS}"
+    _chkCfgLink ${CP_RESOURCES}/bin/run.conf ${CRASHPLAN_PATH}/bin/run.conf
+fi
 
 # For some reason CrashPlan listens to the port above the one listed in the config
 CFG_SVC_PORT=$(expr ${PUBLIC_PORT} - 1)

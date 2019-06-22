@@ -80,7 +80,7 @@ fi
 cfg="${CRASHPLAN_PATH}/conf/my.service.xml"
 
 # Wait for the CrashPlan java process to start listening on any port and record that as the ui port
-while ui_port="$(netstat -ltnp 2>/dev/null | grep 'java' | head -n 1 | awk '{ print $4 }')" && [ -z ${ui_port} ]; do sleep .5; done
+while ui_port="$(netstat -ltnp 2>/dev/null | grep -Ei 'java|CrashPlan' | head -n 1 | awk '{ print $4 }')" && [ -z ${ui_port} ]; do sleep .5; done
 svc_port="$(sed -rn 's/.*<servicePort>([0-9]+)<\/servicePort>.*/\1/p' ${cfg})"
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=${ui_port##*:}
 
