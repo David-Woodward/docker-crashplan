@@ -60,9 +60,9 @@ RUN ALPINE_GLIBC_BASE_URL='https://github.com/sgerrand/alpine-pkg-glibc/releases
 # Installing CrashPlan for Small Business
 ADD /files/crashplan.exp /files/trim_install.sh /files/move_config.sh /tmp/installation/
 
-RUN CRASHPLAN_VERSION=6.9.4 && \
-    CRASHPLAN_TIMESTAMP=1525200006694 && \
-    CRASHPLAN_BUILD=502 && \
+RUN CRASHPLAN_VERSION=7.0.0 && \
+    CRASHPLAN_TIMESTAMP=1525200006700 && \
+    CRASHPLAN_BUILD=581 && \
     CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
     CRASHPLAN_PATH=/usr/local/crashplan && \
     CRASHPLAN_INSTALLER_DEPENDENCIES=expect && \
