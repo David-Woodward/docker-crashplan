@@ -85,7 +85,9 @@ svc_port="$(sed -rn 's/.*<servicePort>([0-9]+)<\/servicePort>.*/\1/p' ${cfg})"
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=${ui_port##*:}
 
 # Capture the CP version from the log file
-cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log.0" | tail -1)"
+# (Looking in "history.log" & "history.log.0" per pending changes documented in the 7.0.0 release notes)
+cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log" 2>/dev/null | tail -1)"
+echo "${cp_version}" | grep -qE '[0-9]' || cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log.0" 2>/dev/null | tail -1)"
 
 # Clean/patch completed upgrades if specified by ${CLEAN_UPGRADES}
 [ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -la "${CRASHPLAN_PATH}/upgrade/"* > /dev/null 2>&1 && ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 && [ "${CLEAN_UPGRADES}" == "1" ] && [ "${cp_version}" != "$(cat /config/cp_version)" ] && /app/trim_install.sh && /app/patch_install.sh

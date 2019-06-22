@@ -12,7 +12,8 @@
 [ -z ${GROUP_ID} ] && export GROUP_ID=0
 [ -z ${BLOCK_UPGRADES} ] && export BLOCK_UPGRADES=1
 [ -z ${CLEAN_UPGRADES} ] && export CLEAN_UPGRADES=0
-[ -z ${LOG_FILES} ] && export LOG_FILES='history.log.0'
+# (Defaulting to "history.log" & "history.log.0" per pending changes documented in the 7.0.0 release notes)
+[ -z ${LOG_FILES} ] && export LOG_FILES='history.log.0 history.log'
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=4244
 
 export LEGACY_VOL=/var/crashplan
