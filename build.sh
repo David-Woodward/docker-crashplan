@@ -6,11 +6,12 @@ usage() {
     echo "
 Usage: $(basename ${0}) [OPTION] [version]
 
--l, --latest        Apply ""latest"" tag in addition to the standard version tag
+-l, --latest        Apply \"latest\" tag in addition to the standard version tag regardless of version increase
 
 -n, --no-build      Do not build a new image - only push the most recent image (implies -p)
 
 -p, --push          Push the image to the docker registry (default is not to push)
+                    NOTE: You must use --latest to apply the \"latest\" tag in the docker registry
 
 
 Version pattern/examples:
