@@ -36,6 +36,8 @@ crashplan start
 
 for file in $(echo ${LOG_FILES} | tr ',' ' '); do
     full_path="${CRASHPLAN_PATH}/log/${file}"
+    [ ! -f "${full_path}" ] && grep -q "/${file}.0</filename>" "${CRASHPLAN_PATH}/conf/service.log.xml" && echo "Correcting requested log file name from '${file}' to '${file}.0'" && full_path="${full_path}.0"
+    [ ! -f "${full_path}" ] && [ "${file}" != "${file%.?}" ] && grep -q "/${file%.?}</filename>" "${CRASHPLAN_PATH}/conf/service.log.xml" && echo "Correcting requested log file name from '${file}' to '${file%.?}'" && full_path="${full_path%.?}"
     [ ! -f "${full_path}" ] && touch "${full_path}" && chown cpuser:${GROUP_ID} "${full_path}"
     FULLPATH_LOG_FILES="${full_path} ${FULLPATH_LOG_FILES}"
 done

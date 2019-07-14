@@ -3,19 +3,6 @@
 # Update the timezone
 [ -n "${TZ}" ] && echo "${TZ}" > /etc/timezone
 
-# Assign default values to variables
-[ -z ${CRASHPLAN_PATH} ] && export CRASHPLAN_PATH=/usr/local/crashplan
-[ -z ${KEEP_APP_RUNNING} ] && export KEEP_APP_RUNNING=1
-[ -z ${STOP_CONTAINER_WITH_APP} ] && export STOP_CONTAINER_WITH_APP=0
-[ -z ${CRASH_RESPONSE_DELAY} ] && export CRASH_RESPONSE_DELAY=30
-[ -z ${USER_ID} ] && export USER_ID=0
-[ -z ${GROUP_ID} ] && export GROUP_ID=0
-[ -z ${BLOCK_UPGRADES} ] && export BLOCK_UPGRADES=1
-[ -z ${CLEAN_UPGRADES} ] && export CLEAN_UPGRADES=0
-# (Defaulting to "history.log" & "history.log.0" per pending changes documented in the 7.0.0 release notes)
-[ -z ${LOG_FILES} ] && export LOG_FILES='history.log.0 history.log'
-[ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=4244
-
 export LEGACY_VOL=/var/crashplan
 export NEW_VOL=/config
 export VOL=${NEW_VOL}
@@ -38,6 +25,18 @@ if [ -d ${LEGACY_VOL} ]; then
     [ -f ${VOL}/machine-id ] || touch ${VOL}/machine-id
 fi
 
+
+# Assign default values to variables
+[ -z "${CRASHPLAN_PATH}" ] && export CRASHPLAN_PATH=/usr/local/crashplan
+[ -z "${KEEP_APP_RUNNING}" ] && export KEEP_APP_RUNNING=1
+[ -z "${STOP_CONTAINER_WITH_APP}" ] && export STOP_CONTAINER_WITH_APP=0
+[ -z "${CRASH_RESPONSE_DELAY}" ] && export CRASH_RESPONSE_DELAY=30
+[ -z "${USER_ID}" ] && export USER_ID=0
+[ -z "${GROUP_ID}" ] && export GROUP_ID=0
+[ -z "${BLOCK_UPGRADES}" ] && export BLOCK_UPGRADES=1
+[ -z "${CLEAN_UPGRADES}" ] && export CLEAN_UPGRADES=0
+[ -z "${LOG_FILES}" ] && export LOG_FILES="$(sed -rn 'N;s|.*<RollingFile\s+name\s*=\s*"HistoryLog"\s*>\s*<filename>.+[}/]+([^/]+)</filename>.*|\1|p;D' "${VOL}/conf/service.log.xml")"
+[ -z "${PUBLIC_PORT}" ] && export PUBLIC_PORT=4244
 
 # Generate machine-id to avoid re-login.
 [ -f ${VOL}/machine-id ] || cat /proc/sys/kernel/random/uuid | tr -d '-' > ${VOL}/machine-id
