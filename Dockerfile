@@ -62,7 +62,7 @@ ADD /files/crashplan.exp /files/trim_install.sh /files/move_config.sh /tmp/insta
 
 RUN CRASHPLAN_VERSION=7.0.0 && \
     CRASHPLAN_TIMESTAMP=1525200006700 && \
-    CRASHPLAN_BUILD=581 && \
+    CRASHPLAN_BUILD=585 && \
     CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
     CRASHPLAN_PATH=/usr/local/crashplan && \
     CRASHPLAN_INSTALLER_DEPENDENCIES=expect && \
