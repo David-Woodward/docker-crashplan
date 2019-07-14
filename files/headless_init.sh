@@ -85,18 +85,18 @@ svc_port="$(sed -rn 's/.*<servicePort>([0-9]+)<\/servicePort>.*/\1/p' ${cfg})"
 [ -z ${PUBLIC_PORT} ] && export PUBLIC_PORT=${ui_port##*:}
 
 # Capture the CP version from the log file
-# (Looking in "history.log" & "history.log.0" per pending changes documented in the 7.0.0 release notes)
-cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log" 2>/dev/null | tail -1)"
-echo "${cp_version}" | grep -qE '[0-9]' || cp_version="$(sed -rn 's/.*started,\s+version\s+([^,]+),.*/\1/p' "${CRASHPLAN_PATH}/log/history.log.0" 2>/dev/null | tail -1)"
+svc_log="$(sed -rn 'N;s|.*<RollingFile\s+name\s*=\s*"ServiceLog"\s*>\s*<filename>.+[}/]+([^/]+)</filename>.*|\1|p;D' "${CRASHPLAN_PATH}/conf/service.log.xml")"
+read cp_version cp_build<<<$(sed -rn 's|.*CPVERSION\s*=\s*(\S+).+\sBuild[:-_, ]+(\S+).*|\1 \2|p' "${CRASHPLAN_PATH}/log/${svc_log}" 2>/dev/null | tail -1)
 
 # Clean/patch completed upgrades if specified by ${CLEAN_UPGRADES}
-[ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -la "${CRASHPLAN_PATH}/upgrade/"* > /dev/null 2>&1 && ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 && [ "${CLEAN_UPGRADES}" == "1" ] && [ "${cp_version}" != "$(cat /config/cp_version)" ] && /app/trim_install.sh && /app/patch_install.sh
+[ -d "${CRASHPLAN_PATH}/upgrade" ] && ls -la "${CRASHPLAN_PATH}/upgrade/"* > /dev/null 2>&1 && ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 && [ "${CLEAN_UPGRADES}" == "1" ] && [ "${cp_build}" != "$(cat /config/cp_build)" ] && /app/trim_install.sh && /app/patch_install.sh
 
 # Record cp_version for upgrade detection
 echo "${cp_version}" > /config/cp_version
+echo "${cp_build}" > /config/cp_build
 
 
-echo "CrashPlan service version ${cp_version} has completed initialization and is listening on ${ui_port}."
+echo "CrashPlan service version ${cp_version} (build ${cp_build}) has completed initialization and is listening on ${ui_port}."
 
 # Get default ip address list from eth0
 default_interface_ip_list=$( getInterfaceIPs 'eth0' )
