@@ -58,6 +58,10 @@ echo "Waiting for the CrashPlan service to initialize ..."
 # Kill any old processes still running from the last execution of this script
 cleanup_procs '(socat|inotify)'
 
+# Perform the user requested configuration tweaks anytime the configuration is changed
+rm -f /tmp/tweak_config.tmp
+inotifyd '/app/tweak_config_changed.sh' "${CRASHPLAN_PATH}/conf/my.service.xml":cx &
+
 # If KEEP_APP_RUNNING=1 then the inotify event that spawned this process will likely
 # be the most timely/efficient way to restart the service when it stops.
 if [ "${KEEP_APP_RUNNING}" == "1" ] && /etc/init.d/crashplan status | grep -q 'stopped' && ( [ ! -d "${CRASHPLAN_PATH}/upgrade" ] || ! ls -lad "${CRASHPLAN_PATH}/upgrade/"*/ > /dev/null 2>&1 ); then

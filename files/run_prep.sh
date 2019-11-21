@@ -83,4 +83,7 @@ fi
 # Remove the old PID
 /etc/init.d/crashplan status | grep -q 'stopped' && rm -f "${CRASHPLAN_PATH}/CrashPlanEngine.pid"
 
+# Perform any user specified configuration tweaks (ie. removing CrashPlan exclusions)
+/app/tweak_config.sh
+
 sync
