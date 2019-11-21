@@ -26,7 +26,7 @@ RUN ALPINE_GLIBC_BASE_URL='https://github.com/sgerrand/alpine-pkg-glibc/releases
     ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
     ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
     ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-${ALPINE_GLIBC_PACKAGE_VERSION}.apk" && \
-    apk add --no-cache wget ca-certificates socat gawk bash openssl findutils coreutils procps libstdc++ && \
+    apk add --no-cache wget ca-certificates socat gawk bash openssl findutils coreutils procps libstdc++ nss && \
     apk add --no-cache cpio --repository http://dl-3.alpinelinux.org/alpine/edge/community/ && \
     #
     # Installing and configuring glibc for alpine
@@ -60,9 +60,9 @@ RUN ALPINE_GLIBC_BASE_URL='https://github.com/sgerrand/alpine-pkg-glibc/releases
 # Installing CrashPlan for Small Business
 ADD /files/crashplan.exp /files/trim_install.sh /files/move_config.sh /tmp/installation/
 #
-RUN CRASHPLAN_VERSION=7.2.0 && \
-    CRASHPLAN_TIMESTAMP=1525200006720 && \
-    CRASHPLAN_BUILD=1641 && \
+RUN CRASHPLAN_VERSION=7.4.0 && \
+    CRASHPLAN_TIMESTAMP=1525200006740 && \
+    CRASHPLAN_BUILD=566 && \
     CRASHPLAN_URL=https://web-eam-msp.crashplanpro.com/client/installers/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
     CRASHPLAN_ALT_URL=https://download.code42.com/installs/agent/${CRASHPLAN_VERSION}/${CRASHPLAN_BUILD}/install/CrashPlanSmb_${CRASHPLAN_VERSION}_${CRASHPLAN_TIMESTAMP}_${CRASHPLAN_BUILD}_Linux.tgz && \
     CRASHPLAN_PATH=/usr/local/crashplan && \

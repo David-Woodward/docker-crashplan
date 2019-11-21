@@ -1,7 +1,7 @@
 # Headless CrashPlan for Small Business Docker Image
 [![Docker Stars](https://img.shields.io/docker/stars/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![Docker Pulls](https://img.shields.io/docker/pulls/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![Build Status](https://img.shields.io/docker/cloud/build/woodwarden/crashplan-headless.svg)](https://hub.docker.com/r/woodwarden/crashplan-headless 'DockerHub') [![Docker Layers](https://images.microbadger.com/badges/image/woodwarden/crashplan-headless.svg)](https://microbadger.com/images/woodwarden/crashplan-headless "How's that for lightweight?") [![Gratitude](https://img.shields.io/badge/buy%20me%20a%20coffee-PayPal-green.svg)](https://www.paypal.me/techdude/4.01usd 'Caffeinate, Code, Repeat')
 
-(Yes, this still works for CrashPlan 7.2.0 - for configuration/monitoring only - [RESTORES FROM THE REMOTE CLIENT WILL NOT WORK](#restores-fail))
+(Yes, this still works for CrashPlan 7.4.0 - for configuration/monitoring only - [RESTORES FROM THE REMOTE CLIENT WILL NOT WORK](#restores-fail))
 
 # Disclaimers
 **IMPORTANT: DO NOT CONTACT CODE42 FOR SUPPORT USING CRASHPLAN WITH THIS DOCKER IMAGE**
@@ -21,7 +21,7 @@ For example, recent changes to the list of excluded "system files" prevented the
 So, although this Docker image could be used to allow continued use of CrashPlan in a headless environment, it would be wise to consider this a temporary measure at best.  Recognizing Code42's growing intolerance for headless/NAS installations and growing restrictions on the type of data that can be backed up, it may be time to look at other *supported* solutions for backing up your data.  This is especially true for advanced users who are using the NAS for software development, virtual machines, or anything other than basic document/media file storage.
 
 # Description
-A lightweight (187MB) Crashplan Docker image supporting headless operations from a CrashPlan client running on a remote system.  For example, using this Docker image, CrashPlan services can run directly on a Synology NAS and then can be configured/controlled from a standard CrashPlan installation on a Windows laptop.
+A lightweight (215MB) Crashplan Docker image supporting headless operations from a CrashPlan client running on a remote system.  For example, using this Docker image, CrashPlan services can run directly on a Synology NAS and then can be configured/controlled from a standard CrashPlan installation on a Windows laptop.
 
 This Docker image is an amalgamation of two other well known Docker images: [JrCs/crashplan](https://github.com/JrCs/docker-crashplan) and [jlesage/crashplan-pro](https://github.com/jlesage/docker-crashplan-pro).  The image has the lightweight/headless operation of the older JrCs image, but uses the volume/directory structure used by the more recent jlesage image.  This allows for easy migration to a jlesage container if needed (for example if future CrashPlan releases include changes that prevent the techniques used by this image to allow headless operations).  The image does support running under the old JrCs volume/directory structure to allow for initial testing by users who are currently using a JrCs based container, but it is recommended that containers based on this image be run with the new jlesage volume (/config) as support and the JrCs volume (/var/crashplan) may be dropped from future versions.
 
@@ -193,6 +193,11 @@ For example, the text "<pattern regex="(?i).*\.vmdk"/>" prevents the backup of V
 Caution should be used when using this feature to avoid producing invalid XML.  For example, using the feature to remove an entire node of XML that spans multiple lines would likely cause a problem unless all the lines within the XML node were unique within the file.  Otherwise the text that is not unique would be removed from multiple XML nodes on the file and/or new unanticipated lines later added to the node would become new child nodes under the parent node.
 
 ## Troubleshooting
+
+### "Code42 cannot connect to its background service" Error Message on Client
+
+Generally this is caused by a CrashPlan update or a user action that triggers a change in the files used by the CrashPlan background service to identify itslef to the client application.  To get everything back in sync and working again, re-copy the the `.ui_info` and `service.pem` files to your client system from the `var` directory on the headless CrashPlan installation as detailed in the [Quick Start](#quick-start) section.
+
 
 ### Shell Access
 
