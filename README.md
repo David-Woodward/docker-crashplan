@@ -186,9 +186,9 @@ Features listed here are still under development and should only be used with th
 
 ### Persistent Configuration Tweaks
 
-**my.service.xml.remove:**  Adding this file to the directory path mounted to the `/config` volume facilitates the removal of certain text from the "my.service.xml" file.  This is primarily used to remove some of the backup restrictions code42 enforces through the "excludeSystem" section.
+**my.service.xml.remove:**  Adding this file to the directory path mounted to the `/config` volume facilitates the removal of certain text from the "my.service.xml" file.  This is primarily used to remove some of the backup restrictions Code42 enforces through the "excludeSystem" section.
 
-For example, the text "<pattern regex="(?i).*\.vmdk"/>" prevents the backup of VMware virtual disks.  To remove that restriction from the config file, just add that text on it's own line in the "my.service.xml.remove" file and the next time the container is started the text will be removed from the config file.  The config file is also monitored for changes while the container is running and the text is removed any time it is added back by the code42 servers (though it is unclear whether or not these changes are effective without restarting the container).
+For example, the text `<pattern regex="(?i).*\.vmdk"/>` prevents the backup of VMware virtual disks.  To remove that restriction from the config file, just add that text on it's own line in the `my.service.xml.remove` file and the next time the container is started the text will be removed from the config file.  The config file is also monitored for changes while the container is running and the text is removed any time it is added back by the Code42 servers (though it is unclear whether or not these changes are effective without restarting the container).
 
 Caution should be used when using this feature to avoid producing invalid XML.  For example, using the feature to remove an entire node of XML that spans multiple lines would likely cause a problem unless all the lines within the XML node were unique within the file.  Otherwise the text that is not unique would be removed from multiple XML nodes on the file and/or new unanticipated lines later added to the node would become new child nodes under the parent node.
 
